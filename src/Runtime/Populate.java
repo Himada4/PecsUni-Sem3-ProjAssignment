@@ -10,6 +10,12 @@ import java.util.ArrayList;
 public class Populate {
     private static final String folderRelativePath = "Database/Catalog.txt";
 
+    // FOR MANUAL GENERATION
+    public void insertEmployeeData(Employee employee){
+        FileProcessor.writeFile(folderRelativePath, employee);
+    }
+
+    //FOR RANDOM GENERATION (Pre-simulation generation)
     public void setEmployeeData(int numOfEmployees){
 
         File folder = new File("Database");
@@ -17,7 +23,7 @@ public class Populate {
 
         //Create a new catalog file if file does not exist.
         if(!FileProcessor.doesFileExist(folderRelativePath)) {
-            FileProcessor.createFile(folderRelativePath, numOfEmployees);
+            FileProcessor.createRandomFile(folderRelativePath, numOfEmployees);
             return;
         }
 
@@ -27,7 +33,7 @@ public class Populate {
         if(Buffer.size() == numOfEmployees) return;
 
         //Appends Text File with more Employees, if not Delete necessary lines
-        FileProcessor.writeFile(folderRelativePath, numOfEmployees, Buffer.size(), Buffer.size() < numOfEmployees);
+        FileProcessor.writeRandomFile(folderRelativePath, numOfEmployees, Buffer.size(), Buffer.size() < numOfEmployees);
 
     }
 

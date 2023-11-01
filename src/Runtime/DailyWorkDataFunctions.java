@@ -23,6 +23,7 @@ public class DailyWorkDataFunctions {
         this.numberOfDaysPassed = numberOfDaysPassed;
     }
 
+    //Write into the Daily work Text files
     public void setDailyWorkRawData(){
 
         File[] files = new File(folderRelativePath).listFiles();
@@ -61,7 +62,7 @@ public class DailyWorkDataFunctions {
             int startingIndex = files.length + 1;
 
             for(int i = startingIndex; i < startingIndex + numberOfFilesToBeGenerated; i ++){
-                FileProcessor.writeFile(folderRelativePath + "/Day_" + i + ".txt", EmployeeData.size(), i);
+                FileProcessor.writeRandomFile(folderRelativePath + "/Day_" + i + ".txt", EmployeeData.size(), i);
             }
         }
         //Requires deletion of logs
@@ -75,6 +76,8 @@ public class DailyWorkDataFunctions {
         }
     }
 
+
+    //Updates the Employee Collection's Sum of worked hours, Sum of Missed hours, and Sum of Overtime Hours
     public EmployeeData<Employee> incorporateDailyWorkData(){
 
         //setSumOfWorkHours // Daily Work data
@@ -89,10 +92,11 @@ public class DailyWorkDataFunctions {
                 String identifier = splitLine[0];
                 int hoursWorkedOnDay = Integer.parseInt(splitLine[1]);
 
-                if (searchIfExist(identifier, EmployeeData)) {
+                if (Utility.searchIfExist(identifier, EmployeeData)) {
 
-                    int index = searchIndex(identifier, EmployeeData);
+                    int index = Utility.searchIndex(identifier, EmployeeData);
                     Employee currEmp = EmployeeData.get(index);
+
 
                     //ADDS the total Worked hours
                     currEmp.setSumOfWorkHours(currEmp.getSumOfWorkHours() + hoursWorkedOnDay);
@@ -105,38 +109,11 @@ public class DailyWorkDataFunctions {
                         currEmp.setSumOfMissedHours(currEmp.getSumOfMissedHours() + (currEmp.getRequiredDailyWorkHours() - hoursWorkedOnDay));
 
                     currEmp.setWage();
+
                 }
             }
         }
 
         return EmployeeData;
-    }
-
-    private static boolean searchIfExist(String searchTarget, EmployeeData<Employee> searchPool){
-
-        boolean found = false;
-        for(Employee employee : searchPool.getEmployeeList()){
-
-            if (Objects.equals(searchTarget, employee.getIdentifier())) {
-                found = true;
-                break;
-            }
-        }
-
-        return found;
-    }
-
-    private static int searchIndex(String searchTarget, EmployeeData<Employee> searchPool){
-
-        int index = 0;
-
-        for(int i  = 0; i < searchPool.size(); i ++){
-            if(Objects.equals(searchTarget, searchPool.get(i).getIdentifier())) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
     }
 }

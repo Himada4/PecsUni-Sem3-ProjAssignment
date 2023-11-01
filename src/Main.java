@@ -14,33 +14,34 @@ public class Main {
 
         //!!!!!Make sure to run the program once to allow for Database Folder to generate!!!!!!
 
-        //Check if Database exist, if not, then go straight to prompts
-        //if exists, ask if overriding or appending/editing , note that this is to create test pool, not input itself
+        //Pre Simulation Checks:
+        //Check if Database exist, if not, go straight to Options
+        //If Database exists, ask if restarting with another set of random data, note that this is to create test pool, not input itself
         //Update the Database
+
+        //Options:
         //1)Input new employee
         //2)Input new Log
-            //What day
-            //ID
-            //hours worked
-            //Update
         //3)Print Employee (Search based on ID)
         //4)Print Employee list Sorted by name (Showing Name, Position, and Wage)
         //5)Print Employee list Sorted by missed hours (Showing Name, Position, Missed Hours)
         //6)End
 
-        System.out.printf("_______________________________________________________________________________%n%n%n");
+        System.out.printf("_______________________________________________________________________________%n");
         Scanner scanner = new Scanner(System.in);
+        scanner.useDelimiter("\n");
         int numOfEmployees = 0;
         int daysPassed = 0;
 
-        //Skip Inputs if unTouch = True
+        //Skip Pre-Simulation Prompts if No overriding is needed.
         if (Calibration.preCheck(scanner)){
             //If The Existing Database Does not need to be touched, get information(employee data, and days passed) via file reading.
-            Options.beginPrompt(updateDatabase(new Populate().getEmployeeData(), Utility.numOfDaysData()), scanner);
+            new Options(Utility.updateDatabase(new Populate().getEmployeeData(), Utility.numOfDaysData()), scanner).beginPrompt();
 
             return;
         }
 
+        //Pre Simulation Random data generation
         while (true) {
             System.out.print("Please Input the Number Of Employees:\n");
 
@@ -72,23 +73,10 @@ public class Main {
         //Populate the Employee Collection with data extracted from the Catalog File.
         EmployeeData<Employee> catalogEmployeeData = populate.getEmployeeData();
 
-        Options.beginPrompt(updateDatabase(catalogEmployeeData, daysPassed), scanner);
-
+        new Options(Utility.updateDatabase(catalogEmployeeData, daysPassed), scanner)
+        .beginPrompt();
 
 
         scanner.close();
-    }
-
-    public static EmployeeData<Employee> updateDatabase(EmployeeData<Employee> catalogEmployeeData, int daysPassed){
-
-        //TASK 2
-        DailyWorkDataFunctions dailyWorkData = new DailyWorkDataFunctions(catalogEmployeeData, daysPassed);
-        //Generate - Calibrate the Daily Work Data Files for use, matching with the number of days passed.
-        dailyWorkData.generateDailyWorkRawData();
-        //Populate the ArrayList collection with ALL data extracted from the DailyWorkDataFiles Folder.
-        dailyWorkData.setDailyWorkRawData();
-        //Incorporates the worked hours to the existing Employee collection.
-        return dailyWorkData.incorporateDailyWorkData();
-
     }
 }

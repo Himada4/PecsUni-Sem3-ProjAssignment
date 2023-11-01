@@ -23,14 +23,13 @@ public class Manager extends Employee{
         return monthlyWage;
     }
 
-    public void print(){
-        //DEBUG
-
+    @Override public void print(){
+        System.out.println("\n-----------------------------------------");
         System.out.println("INFORMATION ON " + getName() + ", the Manager");
-        System.out.println("Basic Wage: " + getMonthlyWage());
+        System.out.println("Monthly Wage: " + getMonthlyWage());
         System.out.println("Overtime Wage: " + overtimeWage);
-        System.out.println("Sum of Overtime Hours: " + getSumOfOvertimeHours());
         System.out.println("Sum of Total Hours: " + getSumOfWorkHours());
+        System.out.println("Sum of Overtime Hours: " + getSumOfOvertimeHours());
         System.out.println("Sum of Missed Hours: " + getSumOfMissedHours());
         System.out.println("Total Wage: " + Wage);
         System.out.println("-----------------------------------------");

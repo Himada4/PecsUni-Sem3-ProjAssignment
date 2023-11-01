@@ -24,16 +24,15 @@ public class Worker extends Employee{
         return hourlyWage;
     }
 
-    public void print(){
-        //DEBUG
-
+    @Override public void print(){
+        System.out.println("\n-----------------------------------------");
         System.out.println("INFORMATION ON " + getName() + ", the Worker");
         System.out.println("Required Daily Work Hours: " + getRequiredDailyWorkHours());
-        System.out.println("basic Wage: " + getHourlyWage());
-        System.out.println("Sum of Overtime Hours: " + getSumOfOvertimeHours());
+        System.out.println("Hourly Wage: " + getHourlyWage());
         System.out.println("Sum of Total Hours: " + getSumOfWorkHours());
+        System.out.println("Sum of Overtime Hours: " + getSumOfOvertimeHours());
         System.out.println("Sum of Missed Hours: " + getSumOfMissedHours());
-        System.out.println("Overtime Wage: 1 + " + overtimeWagePercentile);
+        System.out.printf("Overtime Wage Percentile: %s%%%n",(1 + overtimeWagePercentile) * 100);
         System.out.println("Total Wage: " + Wage);
         System.out.println("-----------------------------------------");
     }

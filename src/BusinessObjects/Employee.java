@@ -50,6 +50,8 @@ public abstract class Employee {
     //SETTERS
     public abstract void setWage();
 
+    public abstract void print();
+
     public void setSumOfWorkHours(int sumOfWorkHours) { // Daily Work data
         this.sumOfWorkHours = sumOfWorkHours;
     }

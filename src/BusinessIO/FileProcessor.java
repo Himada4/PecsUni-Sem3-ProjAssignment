@@ -1,6 +1,9 @@
 package BusinessIO;
 
+import BusinessObjects.Employee;
+import BusinessObjects.Manager;
 import BusinessObjects.Names;
+import BusinessObjects.Worker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -42,25 +46,122 @@ public class FileProcessor {
 
         return rawText;
     }
-
     public static boolean doesFileExist(String Path){
         File file = new File(Path);
         return file.exists() && file.isFile();
     }
-
     public static boolean doesFolderExist(String Path){
         File folder = new File(Path);
         return folder.exists() && folder.isDirectory();
     }
+    public static ArrayList<String> updateDailyWorkArrayList(ArrayList<String> originalArrayList, String searchTargetID, int hoursWorked){
 
-    public static void createFile(String Path, int numOfEmployees){
+        ArrayList<String> updatedArrayList = new ArrayList<>();
+
+        for (var t : originalArrayList){
+            String[] split = t.split(";");
+            if(Objects.equals(searchTargetID, split[0])){
+                int addedVal = Integer.parseInt(split[1]) + hoursWorked;
+                updatedArrayList.add(searchTargetID + ";" + addedVal);
+            }else{
+                updatedArrayList.add(t);
+            }
+        }
+
+        return updatedArrayList;
+
+    }
+
+
+    //FOR MANUAL INPUTS (OPTION 1 and 2)
+    public static String createEmployeeLine(Employee employee){
+        String position = null;
+        int wage = 0;
+        String overtimeWage = null;
+        if(employee instanceof Worker worker) {
+            position = "Worker";
+            wage = worker.getHourlyWage();
+            DecimalFormat df = new DecimalFormat("#.##");
+            overtimeWage = String.valueOf(Double.parseDouble(df.format(worker.getOvertimeWagePercentile())));
+        }
+        else if (employee instanceof Manager manager){
+            position = "Manager";
+            wage = manager.getMonthlyWage();
+            overtimeWage = String.valueOf(manager.getOvertimeWage());
+        }
+
+        String employeeID = employee.getIdentifier();
+        String name = employee.getName();
+
+        int requiredHours = employee.getRequiredDailyWorkHours();
+
+        return employeeID + ";" + name + ";" + position + ";" + requiredHours + ";" + wage + ";" + overtimeWage;
+    }
+    public static void writeFile(String Path, Employee employee){
+
+
+        try (FileWriter fileWriter = new FileWriter(Path, true)) {
+
+            fileWriter.write("\n" + createEmployeeLine(employee));
+
+        } catch (IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+    }
+    public static void writeFile(String Path, int dayNum, boolean newLog, String employeeID, int hoursWorked){
+
+        try {
+            if(newLog){
+                FileWriter fileWriter = new FileWriter(Path);
+                fileWriter.write("Identifier;HoursWorked On the day");
+                fileWriter.write("\n" + employeeID + ";" + hoursWorked);
+                fileWriter.close();
+                System.out.printf("%nDaily Work Data File Day %d created successfully.", dayNum);
+            }else{
+                ArrayList<String> updatedDailyData = updateDailyWorkArrayList(readFile(Path), employeeID, hoursWorked);
+                FileWriter fileWriter = new FileWriter(Path);
+                fileWriter.write("Identifier;HoursWorked On the day");
+                for(String line : updatedDailyData){
+                    fileWriter.write("\n" + line);
+                }
+                fileWriter.close();
+                System.out.printf("%nDaily Work Data File Day %d updated successfully.", dayNum);
+            }
+        } catch (IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+
+
+    //FOR WRITING RANDOM CATALOG FILES
+    public static void writeRandomFile(String Path, int newNumOfEmployees, int currNumOfEmployees, boolean Append){
+
+        ArrayList<String> temp = readFile(Path);
+
+        try (FileWriter fileWriter = new FileWriter(Path, Append)) {
+            if(Append){
+                for(int i = currNumOfEmployees + 1; i <= newNumOfEmployees; i ++){
+                    fileWriter.write(createRandomEmployeeLine(i));
+                }
+            }else{
+                fileWriter.write("Identifier;Name;Position;Required Work Hours;Base Wage;Overtime Wage");
+                for(int i = 0; i < newNumOfEmployees; i ++){
+                    fileWriter.write("\n" + temp.get(i));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+    }
+    public static void createRandomFile(String Path, int numOfEmployees){
 
         try {
             FileWriter fileWriter = new FileWriter(Path);
 
             fileWriter.write("Identifier;Name;Position;Required Work Hours;Base Wage;Overtime Wage");
 
-            for (int i = 1; i <= numOfEmployees; i++) fileWriter.write(createEmployeeLine(i));
+            for (int i = 1; i <= numOfEmployees; i++) fileWriter.write(createRandomEmployeeLine(i));
 
             fileWriter.close();
 
@@ -70,8 +171,7 @@ public class FileProcessor {
             System.err.println("An error occurred: " + e.getMessage());
         }
     }
-
-    public static String createEmployeeLine(int i) {
+    public static String createRandomEmployeeLine(int i) {
 
         Random random = new Random();
         String employeeID = "ID" + String.format("%03d", i);
@@ -89,29 +189,9 @@ public class FileProcessor {
         return "\n" + employeeID + ";" + name + ";" + position + ";" + requiredHours + ";" + wage + ";" + overtimeWage;
     }
 
-    //FOR WRITING CATALOG FILES
-    public static void writeFile(String Path, int newNumOfEmployees, int currNumOfEmployees, boolean Append){
 
-        ArrayList<String> temp = readFile(Path);
-
-        try (FileWriter fileWriter = new FileWriter(Path, Append)) {
-            if(Append){
-                for(int i = currNumOfEmployees + 1; i <= newNumOfEmployees; i ++){
-                    fileWriter.write(createEmployeeLine(i));
-                }
-            }else{
-                fileWriter.write("Identifier;Name;Position;Required Work Hours;Base Wage;Overtime Wage");
-                for(int i = 0; i < newNumOfEmployees; i ++){
-                    fileWriter.write("\n" + temp.get(i));
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
-        }
-    }
-
-    //FOR WRITING DAILY WORK DATA FILES
-    public static void writeFile(String Path, int numOfEmployees, int dayNum){
+    //FOR WRITING RANDOM DAILY WORK DATA FILES
+    public static void writeRandomFile(String Path, int numOfEmployees, int dayNum){
 
         try {
             FileWriter fileWriter = new FileWriter(Path);
@@ -135,6 +215,8 @@ public class FileProcessor {
         }
     }
 
+
+    //FOR REMOVING UNNECESSARY FILES AND FOLDERS IN THE CURRENT ITERATION
     public static void deleteFile(String Path){
         File fileToDelete = new File(Path);
 

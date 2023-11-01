@@ -8,6 +8,8 @@ public class Printer {
         this.Employees = Employees;
     }
 
+
+    //Task 3: Print list of employees in order of names
     public void printNameAndWage(){
 
         Employees.sortByName();
