@@ -8,12 +8,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Populate {
-    private final int numOfEmployees;
     private static final String folderRelativePath = "Database/Catalog.txt";
-    public Populate(int numOfEmployees){
-        this.numOfEmployees = numOfEmployees;
-    }
-    public void setEmployeeData(){
+
+    public void setEmployeeData(int numOfEmployees){
 
         File folder = new File("Database");
         if (!folder.exists()) folder.mkdirs();

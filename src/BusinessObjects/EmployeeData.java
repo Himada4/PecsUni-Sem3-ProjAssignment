@@ -22,7 +22,7 @@ public class EmployeeData<T extends Employee> {
 
     public void sortByName() {
         EmployeeList.sort(
-                (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName())
+                (employee1, employee2) -> employee1.getName().compareToIgnoreCase(employee2.getName())
         );
     }
 

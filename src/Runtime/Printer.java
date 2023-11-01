@@ -63,7 +63,7 @@ public class Printer {
             }
             //Assuming there are 26 working days in a month
             else if (employee instanceof Manager manager){
-                normalWage = (int) (double)Math.round((((double)(manager.getSumOfWorkHours() - manager.getSumOfOvertimeHours())/(26 * manager.getRequiredDailyWorkHours())) * manager.getMonthlyWage()) * 100) / 100;
+                normalWage = (int) (double) Math.round((((double)(manager.getSumOfWorkHours() - manager.getSumOfOvertimeHours())/(26 * manager.getRequiredDailyWorkHours())) * manager.getMonthlyWage()) * 100) / 100;
                 overtimeWage = manager.getOvertimeWage() * manager.getSumOfOvertimeHours();
                 loss = (int) ((double)manager.getSumOfMissedHours() /(26 * manager.getRequiredDailyWorkHours()) * manager.getMonthlyWage());
                 baseWage = manager.getMonthlyWage();
@@ -91,7 +91,7 @@ public class Printer {
             }
             //Assuming there are 26 working days in a month
             else if (employee instanceof Manager manager){
-                normalWage += (int)(double)Math.round((((double)(manager.getSumOfWorkHours() - manager.getSumOfOvertimeHours())/(26 * manager.getRequiredDailyWorkHours())) * manager.getMonthlyWage()) * 100) / 100;
+                normalWage += (int)(double) Math.round((((double)(manager.getSumOfWorkHours() - manager.getSumOfOvertimeHours())/(26 * manager.getRequiredDailyWorkHours())) * manager.getMonthlyWage()) * 100) / 100;
                 overtimeWage += manager.getOvertimeWage() * manager.getSumOfOvertimeHours();
                 loss += (int) ((double)manager.getSumOfMissedHours() /(26 * manager.getRequiredDailyWorkHours()) * manager.getMonthlyWage());
             }

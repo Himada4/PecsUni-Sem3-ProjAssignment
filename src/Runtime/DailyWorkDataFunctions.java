@@ -61,7 +61,7 @@ public class DailyWorkDataFunctions {
             int startingIndex = files.length + 1;
 
             for(int i = startingIndex; i < startingIndex + numberOfFilesToBeGenerated; i ++){
-                FileProcessor.writeFile(folderRelativePath + "/Day_" + i + ".txt", EmployeeData.size());
+                FileProcessor.writeFile(folderRelativePath + "/Day_" + i + ".txt", EmployeeData.size(), i);
             }
         }
         //Requires deletion of logs
@@ -75,7 +75,7 @@ public class DailyWorkDataFunctions {
         }
     }
 
-    public void incorporateDailyWorkData(){
+    public EmployeeData<Employee> incorporateDailyWorkData(){
 
         //setSumOfWorkHours // Daily Work data
         //setSumOfMissedHours//Req hours - Daily work > 0
@@ -105,10 +105,11 @@ public class DailyWorkDataFunctions {
                         currEmp.setSumOfMissedHours(currEmp.getSumOfMissedHours() + (currEmp.getRequiredDailyWorkHours() - hoursWorkedOnDay));
 
                     currEmp.setWage();
-
                 }
             }
         }
+
+        return EmployeeData;
     }
 
     private static boolean searchIfExist(String searchTarget, EmployeeData<Employee> searchPool){

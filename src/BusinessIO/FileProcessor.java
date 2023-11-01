@@ -6,10 +6,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
+
 
 public class FileProcessor {
 
@@ -42,6 +46,11 @@ public class FileProcessor {
     public static boolean doesFileExist(String Path){
         File file = new File(Path);
         return file.exists() && file.isFile();
+    }
+
+    public static boolean doesFolderExist(String Path){
+        File folder = new File(Path);
+        return folder.exists() && folder.isDirectory();
     }
 
     public static void createFile(String Path, int numOfEmployees){
@@ -102,7 +111,7 @@ public class FileProcessor {
     }
 
     //FOR WRITING DAILY WORK DATA FILES
-    public static void writeFile(String Path, int numOfEmployees){
+    public static void writeFile(String Path, int numOfEmployees, int dayNum){
 
         try {
             FileWriter fileWriter = new FileWriter(Path);
@@ -119,7 +128,7 @@ public class FileProcessor {
                 fileWriter.write(line);
             }
             fileWriter.close();
-            System.out.println("Daily Work Data File created successfully.");
+            System.out.printf("%nDaily Work Data File Day %d created successfully.", dayNum);
 
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
@@ -139,6 +148,24 @@ public class FileProcessor {
             if (!fileToDelete.delete()) System.err.println("Unable to delete the file.");
 
             System.out.println("File deleted successfully.");
+        }
+    }
+
+    public static void deleteFolder(String folderPath) {
+        try {
+            Path directory = Paths.get(folderPath);
+            Files.walk(directory)
+                    .sorted((p1, p2) -> -p1.compareTo(p2))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            System.out.println("Database has been reset. Regenerating...");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
