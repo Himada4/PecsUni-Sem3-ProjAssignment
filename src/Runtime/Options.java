@@ -209,7 +209,8 @@ public class Options{
 
         //create new log or
         //append selected log
-        fp.writeFile("Database/DailyWorkDataFiles/Day_" + dayNumber + ".txt", Integer.parseInt(dayNumber), Integer.parseInt(dayNumber) == query.getNumOfDaysFromFileCount() + 1, identifier, Integer.parseInt(hoursWorkedOnDay));
+        fp.writeFile("Database/DailyWorkDataFiles/Day_" + dayNumber + ".txt", Integer.parseInt(dayNumber),
+                Integer.parseInt(dayNumber) == query.getNumOfDaysFromFileCount() + 1, identifier, Integer.parseInt(hoursWorkedOnDay));
 
         query.getNumOfDaysFromFileCount();
         query.getDailyWorkRawData();

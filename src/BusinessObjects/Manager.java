@@ -39,7 +39,11 @@ public class Manager extends Employee{
 
     @Override public Employee clone(){
 
-        return new Manager(getIdentifier(), getName(), getRequiredDailyWorkHours(), getMonthlyWage(), getOvertimeWage());
+        Manager clonedManager = new Manager(getIdentifier(), getName(), getRequiredDailyWorkHours(), getMonthlyWage(), getOvertimeWage());
+        clonedManager.setSumOfMissedHours(getSumOfMissedHours());
+        clonedManager.setSumOfWorkHours(getSumOfWorkHours());
+        clonedManager.setSumOfOvertimeHours(getSumOfOvertimeHours());
+        return clonedManager;
 
     }
 }

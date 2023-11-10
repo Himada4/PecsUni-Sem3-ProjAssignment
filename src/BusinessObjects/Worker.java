@@ -40,8 +40,11 @@ public class Worker extends Employee{
     }
 
     @Override public Employee clone(){
-
-        return new Worker(getIdentifier(), getName(), getRequiredDailyWorkHours(),getHourlyWage(),getOvertimeWagePercentile());
+        Worker clonedWorker = new Worker(getIdentifier(), getName(), getRequiredDailyWorkHours(),getHourlyWage(),getOvertimeWagePercentile());
+        clonedWorker.setSumOfMissedHours(getSumOfMissedHours());
+        clonedWorker.setSumOfWorkHours(getSumOfWorkHours());
+        clonedWorker.setSumOfOvertimeHours(getSumOfOvertimeHours());
+        return  clonedWorker;
 
     }
 }

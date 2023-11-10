@@ -5,7 +5,7 @@ import BusinessObjects.*;
 public class Printer {
     private EmployeeData<Employee> Employees;
     public Printer(EmployeeData<Employee> Employees){
-        this.Employees = Employees;
+        this.Employees = Employees.clone();
     }
 
 
@@ -105,6 +105,6 @@ public class Printer {
     }
 
     public void setEmployees(EmployeeData<Employee> employeeData){
-        this.Employees = employeeData;
+        this.Employees = employeeData.clone();
     }
 }

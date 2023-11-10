@@ -58,15 +58,20 @@ public class FileProcessor {
 
         ArrayList<String> updatedArrayList = new ArrayList<>();
 
+        boolean newEmployeeLog = true;
+
         for (var t : originalArrayList){
             String[] split = t.split(";");
             if(Objects.equals(searchTargetID, split[0])){
                 int addedVal = Integer.parseInt(split[1]) + hoursWorked;
                 updatedArrayList.add(searchTargetID + ";" + addedVal);
+                newEmployeeLog = false;
             }else{
                 updatedArrayList.add(t);
             }
         }
+
+        if(newEmployeeLog) updatedArrayList.add(searchTargetID + ";" + hoursWorked);
 
         return updatedArrayList;
 
@@ -98,8 +103,6 @@ public class FileProcessor {
         return employeeID + ";" + name + ";" + position + ";" + requiredHours + ";" + wage + ";" + overtimeWage;
     }
     public void writeFile(String Path, Employee employee){
-
-
         try (FileWriter fileWriter = new FileWriter(Path, true)) {
 
             fileWriter.write("\n" + createEmployeeLine(employee));
