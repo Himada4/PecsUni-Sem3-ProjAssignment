@@ -1,5 +1,7 @@
 package BusinessObjects;
 
+import java.text.DecimalFormat;
+
 public class Worker extends Employee{
     private final double overtimeWagePercentile;
     private final int hourlyWage;
@@ -33,7 +35,13 @@ public class Worker extends Employee{
         System.out.println("Sum of Overtime Hours: " + getSumOfOvertimeHours());
         System.out.println("Sum of Missed Hours: " + getSumOfMissedHours());
         System.out.printf("Overtime Wage Percentile: %s%%%n",(1 + overtimeWagePercentile) * 100);
-        System.out.println("Total Wage: " + Wage);
+        System.out.println("Total Wage: " + Double.parseDouble(new DecimalFormat("#.##").format(Wage)));
         System.out.println("-----------------------------------------");
+    }
+
+    @Override public Employee clone(){
+
+        return new Worker(getIdentifier(), getName(), getRequiredDailyWorkHours(),getHourlyWage(),getOvertimeWagePercentile());
+
     }
 }

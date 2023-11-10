@@ -6,8 +6,6 @@ import BusinessObjects.EmployeeData;
 import BusinessObjects.Manager;
 import BusinessObjects.Worker;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -17,14 +15,19 @@ public class Options{
 
     private  EmployeeData<Employee> catalogEmployeeData;
 
+    private EmployeeData<Employee> init_catalogEmployeeData;
+
     private final Scanner scanner;
 
     private final Printer printer;
 
-    public Options(EmployeeData<Employee> catalogEmployeeData, Scanner scanner){
+    private final Utility util = new Utility();
+
+    public Options(EmployeeData<Employee> catalogEmployeeData, EmployeeData<Employee> init_catalogEmployeeData, Scanner scanner){
         this.catalogEmployeeData = catalogEmployeeData;
         this.scanner = scanner;
         this.printer = new Printer(catalogEmployeeData);
+        this.init_catalogEmployeeData = init_catalogEmployeeData;
     }
     public void beginPrompt(){
 
@@ -36,7 +39,7 @@ public class Options{
             String input;
             while (true) {
                 input = scanner.next();
-                if (!Utility.isInteger(input)) {
+                if (!util.isInteger(input)) {
                     System.out.println("The input is invalid. Please enter a valid integer.");
                     continue;
                 }
@@ -105,7 +108,7 @@ public class Options{
         System.out.printf("%nPlease Type the Required Work Hours Per Day of the Employee:%n");
         while (true) {
             requiredWorkHours = scanner.next();
-            if (!Utility.isInteger(requiredWorkHours)) {
+            if (!util.isInteger(requiredWorkHours)) {
                 System.out.println("The input is invalid. Please enter a valid integer.");
                 continue;
             }
@@ -115,7 +118,7 @@ public class Options{
         System.out.printf("%nPlease Type the Base Wage (Hourly Wage for Worker, Monthly Wage for Manager) of the Employee:%n");
         while (true) {
             baseWage = scanner.next();
-            if (!Utility.isInteger(baseWage)) {
+            if (!util.isInteger(baseWage)) {
                 System.out.println("The input is invalid. Please enter a valid integer.");
                 continue;
             }
@@ -125,41 +128,48 @@ public class Options{
         System.out.printf("%nPlease Type the Overtime wage (Overtime percentile for Worker, Overtime wage for Manager) of the Employee:%n");
         while (true) {
             overtimeWage = scanner.next();
-            if (!Utility.isDouble(overtimeWage)) {
+            if (!util.isDouble(overtimeWage)) {
                 System.out.println("The input is invalid. Please enter a valid decimal from 0.1 to 0.9.");
                 continue;
             }
             break;
         }
-        String employeeID = "ID" + String.format("%03d", catalogEmployeeData.size() + 1);
+        String employeeID = "ID" + String.format("%03d", init_catalogEmployeeData.size() + 1);
 
         Employee employee = (position.equals("Manager"))
                 ? new Manager(employeeID, name, Integer.parseInt(requiredWorkHours), Integer.parseInt(baseWage), Integer.parseInt(overtimeWage))
                 : new Worker(employeeID, name, Integer.parseInt(requiredWorkHours), Integer.parseInt(baseWage), Double.parseDouble(overtimeWage));
 
-        Populate populate = new Populate();
-        populate.insertEmployeeData(employee);
-        catalogEmployeeData = populate.getEmployeeData();
+        QueryCatalog queryCatalog = new QueryCatalog();
+        queryCatalog.insertEmployeeData(employee);
+        init_catalogEmployeeData = queryCatalog.getEmployeeDataFromCatalogFile();
 
-        Utility.updateDatabase(catalogEmployeeData, Utility.numOfDaysData());
+        QueryDailyWork query = new QueryDailyWork(init_catalogEmployeeData);
+        query.getDailyWorkRawData();
+        query.getNumOfDaysFromFileCount();
+        catalogEmployeeData = query.incorporateDailyWorkData();
+        printer.setEmployees(catalogEmployeeData);
 
     }
+
+    @SuppressWarnings("all")
     private void addManualLog(){
 
         String identifier;
         String hoursWorkedOnDay;
         String dayNumber;
+        QueryDailyWork query = new QueryDailyWork(init_catalogEmployeeData);
 
         System.out.printf("%n%n%nPlease enter which day to log:%n");
         while (true) {
             dayNumber = scanner.next();
-            if (!Utility.isInteger(dayNumber)) {
+            if (!util.isInteger(dayNumber)) {
                 System.out.println("The input is invalid. Please enter a valid integer.");
                 continue;
             }
-            if(Integer.parseInt(dayNumber) > Utility.numOfDaysData() + 1){
+            if(Integer.parseInt(dayNumber) > query.getNumOfDaysFromFileCount() + 1){
                 System.out.printf("The day number you are trying to create a log for exceeds the allowed limit.%n" +
-                        "Please enter a day number from 1 to %s.%n", Utility.numOfDaysData() + 1);
+                        "Please enter a day number from 1 to %s.%n", query.getNumOfDaysFromFileCount() + 1);
                 continue;
             }
             break;
@@ -177,7 +187,7 @@ public class Options{
                 System.out.println("The input is invalid. Please enter a valid format. (e.g \"ID024\", \"ID241\")");
                 continue;
             }
-            if(!(Utility.searchIfExist(identifier, catalogEmployeeData))){
+            if(!(util.searchIfExist(identifier, init_catalogEmployeeData))){
                 System.out.println("The Identifier was Not Found. Please enter a Valid Identifier.");
                 continue;
             }
@@ -189,48 +199,25 @@ public class Options{
         while (true) {
             hoursWorkedOnDay = scanner.next();
 
-            if (!(Utility.isInteger(hoursWorkedOnDay))) {
+            if (!(util.isInteger(hoursWorkedOnDay))) {
                 System.out.println("The input is invalid. Please enter a valid integer.");
                 continue;
             }
             break;
         }
+        FileProcessor fp = new FileProcessor();
 
-        if(Integer.parseInt(dayNumber) == Utility.numOfDaysData() + 1){
-            //create new log
-            FileProcessor.writeFile("Database/DailyWorkDataFiles/Day_" + dayNumber + ".txt", Integer.parseInt(dayNumber), true, identifier, Integer.parseInt(hoursWorkedOnDay));
-        }else{
-            //append selected log
-            FileProcessor.writeFile("Database/DailyWorkDataFiles/Day_" + dayNumber + ".txt", Integer.parseInt(dayNumber), false, identifier, Integer.parseInt(hoursWorkedOnDay));
-        }
+        //create new log or
+        //append selected log
+        fp.writeFile("Database/DailyWorkDataFiles/Day_" + dayNumber + ".txt", Integer.parseInt(dayNumber), Integer.parseInt(dayNumber) == query.getNumOfDaysFromFileCount() + 1, identifier, Integer.parseInt(hoursWorkedOnDay));
 
-
-        int overtime = 0;
-        int missedHours = 0;
-        int totalHours = 0;
-        Employee currEmp = catalogEmployeeData.get(Utility.searchIndex(identifier, catalogEmployeeData));
-
-        ArrayList<String> temp = FileProcessor.readFile("Database/DailyWorkDataFiles/Day_" + dayNumber + ".txt");
-
-        for(var t:temp){
-            int hoursOnDay = Integer.parseInt(t.split(";")[1]);
-
-            totalHours += hoursOnDay;
-
-            if(hoursOnDay > currEmp.getRequiredDailyWorkHours())
-                overtime += (hoursOnDay - currEmp.getRequiredDailyWorkHours());
-                //If employee worked LESS than the required work hours (Missed Hours)
-            else if (hoursOnDay < currEmp.getRequiredDailyWorkHours())
-                missedHours += (currEmp.getRequiredDailyWorkHours() - hoursOnDay);
-
-        }
-        currEmp.setSumOfWorkHours(totalHours);
-        currEmp.setSumOfMissedHours(missedHours);
-        currEmp.setSumOfOvertimeHours(overtime);
-        currEmp.setWage();
-
-
+        query.getNumOfDaysFromFileCount();
+        query.getDailyWorkRawData();
+        catalogEmployeeData = query.incorporateDailyWorkData();
+        printer.setEmployees(catalogEmployeeData);
     }
+
+    @SuppressWarnings("all")
     private void searchEmployeeByID(){
         System.out.printf("%nPlease enter the ID to search for::%n");
         String searchTarget;
@@ -244,14 +231,14 @@ public class Options{
                 System.out.println("The input is invalid. Please enter a valid format. (e.g \"ID024\", \"ID241\")");
                 continue;
             }
-            if(!(Utility.searchIfExist(searchTarget, catalogEmployeeData))){
+            if(!(util.searchIfExist(searchTarget, catalogEmployeeData))){
                 System.out.println("The Identifier was Not Found. Please enter a Valid Identifier.");
                 continue;
             }
             break;
         }
 
-        catalogEmployeeData.get(Utility.searchIndex(searchTarget, catalogEmployeeData))
+        catalogEmployeeData.get(util.searchIndex(searchTarget, catalogEmployeeData))
         .print();
     }
     private void sortByNameAndPrint(){

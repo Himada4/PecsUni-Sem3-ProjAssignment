@@ -6,10 +6,11 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Calibration{
-    public static boolean preCheck(Scanner scanner){
+    public boolean preCheck(Scanner scanner){
 
         boolean unTouchData = false;
-        if(!FileProcessor.doesFolderExist("Database")) return unTouchData;
+        FileProcessor fp = new FileProcessor();
+        if(!fp.doesFolderExist("Database")) return false;
 
         System.out.printf("This is a pre-simulation check to calibrate the existing database.%nPlease select:" +
                 "%n1) I Am Restarting From Scratch.                    (Every Data Will Be Erased And Another Set Of Data Will Be Generated.)" +
@@ -18,7 +19,7 @@ public class Calibration{
         String input;
         while (true) {
             input = scanner.next();
-            if (!Utility.isInteger(input)) {
+            if (!new Utility().isInteger(input)) {
                 System.out.println("The input is invalid. Please enter a valid integer.");
                 continue;
             }
@@ -31,7 +32,7 @@ public class Calibration{
 
         switch (input){
             case "1": // Populate the Database from scratch
-                FileProcessor.deleteFolder("Database");
+                fp.deleteFolder("Database");
                 break;
             case "2":
                 System.out.println("Please enter the adjusted values for the following:");

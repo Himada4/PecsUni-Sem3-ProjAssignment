@@ -1,5 +1,7 @@
 package BusinessObjects;
 
+import java.text.DecimalFormat;
+
 public class Manager extends Employee{
     private final int overtimeWage;
     private final int monthlyWage;
@@ -31,7 +33,13 @@ public class Manager extends Employee{
         System.out.println("Sum of Total Hours: " + getSumOfWorkHours());
         System.out.println("Sum of Overtime Hours: " + getSumOfOvertimeHours());
         System.out.println("Sum of Missed Hours: " + getSumOfMissedHours());
-        System.out.println("Total Wage: " + Wage);
+        System.out.println("Total Wage: " + Double.parseDouble(new DecimalFormat("#.##").format(Wage)));
         System.out.println("-----------------------------------------");
+    }
+
+    @Override public Employee clone(){
+
+        return new Manager(getIdentifier(), getName(), getRequiredDailyWorkHours(), getMonthlyWage(), getOvertimeWage());
+
     }
 }

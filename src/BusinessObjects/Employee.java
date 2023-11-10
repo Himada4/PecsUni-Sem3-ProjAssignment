@@ -63,4 +63,7 @@ public abstract class Employee {
     public void setSumOfOvertimeHours(int sumOfOvertimeHours) { // Req hours - daily work < 0
         this.sumOfOvertimeHours = sumOfOvertimeHours;
     }
+
+
+    public abstract Employee clone();
 }

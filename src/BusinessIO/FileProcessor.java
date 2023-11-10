@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class FileProcessor {
 
-    public static ArrayList<String> readFile(String Path){
+    public ArrayList<String> readFile(String Path){
 
         ArrayList<String> rawText = new ArrayList<>();
 
@@ -46,15 +46,15 @@ public class FileProcessor {
 
         return rawText;
     }
-    public static boolean doesFileExist(String Path){
+    public boolean doesFileExist(String Path){
         File file = new File(Path);
         return file.exists() && file.isFile();
     }
-    public static boolean doesFolderExist(String Path){
+    public boolean doesFolderExist(String Path){
         File folder = new File(Path);
         return folder.exists() && folder.isDirectory();
     }
-    public static ArrayList<String> updateDailyWorkArrayList(ArrayList<String> originalArrayList, String searchTargetID, int hoursWorked){
+    public ArrayList<String> updateDailyWorkArrayList(ArrayList<String> originalArrayList, String searchTargetID, int hoursWorked){
 
         ArrayList<String> updatedArrayList = new ArrayList<>();
 
@@ -74,7 +74,7 @@ public class FileProcessor {
 
 
     //FOR MANUAL INPUTS (OPTION 1 and 2)
-    public static String createEmployeeLine(Employee employee){
+    public String createEmployeeLine(Employee employee){
         String position = null;
         int wage = 0;
         String overtimeWage = null;
@@ -97,7 +97,7 @@ public class FileProcessor {
 
         return employeeID + ";" + name + ";" + position + ";" + requiredHours + ";" + wage + ";" + overtimeWage;
     }
-    public static void writeFile(String Path, Employee employee){
+    public void writeFile(String Path, Employee employee){
 
 
         try (FileWriter fileWriter = new FileWriter(Path, true)) {
@@ -108,7 +108,7 @@ public class FileProcessor {
             System.err.println("An error occurred: " + e.getMessage());
         }
     }
-    public static void writeFile(String Path, int dayNum, boolean newLog, String employeeID, int hoursWorked){
+    public void writeFile(String Path, int dayNum, boolean newLog, String employeeID, int hoursWorked){
 
         try {
             if(newLog){
@@ -135,7 +135,7 @@ public class FileProcessor {
 
 
     //FOR WRITING RANDOM CATALOG FILES
-    public static void writeRandomFile(String Path, int newNumOfEmployees, int currNumOfEmployees, boolean Append){
+    public void writeRandomFile(String Path, int newNumOfEmployees, int currNumOfEmployees, boolean Append){
 
         ArrayList<String> temp = readFile(Path);
 
@@ -154,7 +154,7 @@ public class FileProcessor {
             System.err.println("An error occurred: " + e.getMessage());
         }
     }
-    public static void createRandomFile(String Path, int numOfEmployees){
+    public void createRandomFile(String Path, int numOfEmployees){
 
         try {
             FileWriter fileWriter = new FileWriter(Path);
@@ -171,7 +171,7 @@ public class FileProcessor {
             System.err.println("An error occurred: " + e.getMessage());
         }
     }
-    public static String createRandomEmployeeLine(int i) {
+    public String createRandomEmployeeLine(int i) {
 
         Random random = new Random();
         String employeeID = "ID" + String.format("%03d", i);
@@ -191,7 +191,7 @@ public class FileProcessor {
 
 
     //FOR WRITING RANDOM DAILY WORK DATA FILES
-    public static void writeRandomFile(String Path, int numOfEmployees, int dayNum){
+    public void writeRandomFile(String Path, int numOfEmployees, int dayNum){
 
         try {
             FileWriter fileWriter = new FileWriter(Path);
@@ -217,7 +217,7 @@ public class FileProcessor {
 
 
     //FOR REMOVING UNNECESSARY FILES AND FOLDERS IN THE CURRENT ITERATION
-    public static void deleteFile(String Path){
+    public void deleteFile(String Path){
         File fileToDelete = new File(Path);
 
         if(!(fileToDelete.exists() && fileToDelete.isFile())){
@@ -233,7 +233,8 @@ public class FileProcessor {
         }
     }
 
-    public static void deleteFolder(String folderPath) {
+    @SuppressWarnings("all")
+    public void deleteFolder(String folderPath) {
         try {
             Path directory = Paths.get(folderPath);
             Files.walk(directory)

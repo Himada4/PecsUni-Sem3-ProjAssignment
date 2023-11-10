@@ -5,7 +5,7 @@ import BusinessObjects.Manager;
 import BusinessObjects.Worker;
 
 public class Formatter {
-    public static Employee formatIntoNewEmployee(String CatalogRawData) {
+    public Employee formatIntoNewEmployee(String CatalogRawData) {
 
         String[] splitCatalogRawData = CatalogRawData.split(";");
 

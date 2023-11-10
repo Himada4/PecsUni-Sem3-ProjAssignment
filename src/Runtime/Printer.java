@@ -3,7 +3,7 @@ package Runtime;
 import BusinessObjects.*;
 
 public class Printer {
-    private final EmployeeData<Employee> Employees;
+    private EmployeeData<Employee> Employees;
     public Printer(EmployeeData<Employee> Employees){
         this.Employees = Employees;
     }
@@ -44,6 +44,7 @@ public class Printer {
     }
 
     //DEBUG
+    @SuppressWarnings("all")
     public void printWageList(){
 
 
@@ -101,5 +102,9 @@ public class Printer {
         System.out.println("-----------------------------------------------------------");
         System.out.printf("Current Company's Financial Report:%n   Amount of Basic Wages to pay: %s%n   Amount of Overtime Wages to pay: %s%n   Loss resulted from missing hours: %s%n",normalWage, overtimeWage, loss);
         System.out.println("-----------------------------------------------------------");
+    }
+
+    public void setEmployees(EmployeeData<Employee> employeeData){
+        this.Employees = employeeData;
     }
 }

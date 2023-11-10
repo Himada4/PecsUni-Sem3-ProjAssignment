@@ -6,25 +6,21 @@ import BusinessObjects.EmployeeData;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class DailyWorkDataFunctions {
+public class QueryDailyWork {
 
     private static final String folderRelativePath = "Database/DailyWorkDataFiles";
-
-    private final EmployeeData<Employee> EmployeeData;
-
-    private final int numberOfDaysPassed;
+    private int numberOfDaysPassed;
+    private final EmployeeData<Employee> employeeData;
 
     private ArrayList<ArrayList<String>> logsOfNDaysPassed;
 
-    public DailyWorkDataFunctions(EmployeeData<Employee> EmployeeData, int numberOfDaysPassed){
-        this.EmployeeData = EmployeeData;
-        this.numberOfDaysPassed = numberOfDaysPassed;
+    public QueryDailyWork(EmployeeData<Employee> employeeData){
+        this.employeeData = employeeData;
     }
 
-    //Write into the Daily work Text files
-    public void setDailyWorkRawData(){
+    //READING
+    public void getDailyWorkRawData(){
 
         File[] files = new File(folderRelativePath).listFiles();
         ArrayList<String> paths = new ArrayList<>();
@@ -39,16 +35,19 @@ public class DailyWorkDataFunctions {
         ArrayList<ArrayList<String>> output = new ArrayList<>();
 
         for (String path:paths) {
-            ArrayList<String> RawData = FileProcessor.readFile(path);
+            ArrayList<String> RawData = new FileProcessor().readFile(path);
 
             output.add(RawData);
         }
 
-        logsOfNDaysPassed = output;
+        this.logsOfNDaysPassed = output;
     }
 
-    public void generateDailyWorkRawData(){
+    //RANDOM GENERATION
+    @SuppressWarnings("all")
+    public void setDailyWorkRawData(int numberOfDaysPassed){
 
+        this.numberOfDaysPassed = numberOfDaysPassed;
         File folder = new File(folderRelativePath);
         if (!folder.exists()) folder.mkdirs();
 
@@ -56,14 +55,17 @@ public class DailyWorkDataFunctions {
         assert files != null;
         if(numberOfDaysPassed == files.length) return;
 
+        FileProcessor fp = new FileProcessor();
+
         //Requires more logs to be generated
         if(numberOfDaysPassed > files.length){
             int numberOfFilesToBeGenerated = numberOfDaysPassed - files.length;
             int startingIndex = files.length + 1;
 
             for(int i = startingIndex; i < startingIndex + numberOfFilesToBeGenerated; i ++){
-                FileProcessor.writeRandomFile(folderRelativePath + "/Day_" + i + ".txt", EmployeeData.size(), i);
+                fp.writeRandomFile(folderRelativePath + "/Day_" + i + ".txt", employeeData.size(), i);
             }
+            System.out.println("\n");
         }
         //Requires deletion of logs
         else {
@@ -71,7 +73,7 @@ public class DailyWorkDataFunctions {
             int startingIndex = numberOfDaysPassed + 1;
 
             for(int i = startingIndex; i < startingIndex + numberOfFilesToBeDeleted; i ++){
-                FileProcessor.deleteFile(folderRelativePath + "/Day_" + i + ".txt");
+                fp.deleteFile(folderRelativePath + "/Day_" + i + ".txt");
             }
         }
     }
@@ -91,11 +93,11 @@ public class DailyWorkDataFunctions {
 
                 String identifier = splitLine[0];
                 int hoursWorkedOnDay = Integer.parseInt(splitLine[1]);
+                Utility util = new Utility();
+                if (util.searchIfExist(identifier, employeeData)) {
 
-                if (Utility.searchIfExist(identifier, EmployeeData)) {
-
-                    int index = Utility.searchIndex(identifier, EmployeeData);
-                    Employee currEmp = EmployeeData.get(index);
+                    int index = util.searchIndex(identifier, employeeData);
+                    Employee currEmp = employeeData.get(index);
 
 
                     //ADDS the total Worked hours
@@ -114,6 +116,13 @@ public class DailyWorkDataFunctions {
             }
         }
 
-        return EmployeeData;
+        return employeeData;
+    }
+
+    public int getNumOfDaysFromFileCount(){
+        File[] files = new File("Database/DailyWorkDataFiles").listFiles();
+        assert files != null;
+        this.numberOfDaysPassed = files.length;
+        return files.length;
     }
 }

@@ -2,12 +2,14 @@ package BusinessObjects;
 
 import java.util.ArrayList;
 
-public class EmployeeData<T extends Employee> {
+public class EmployeeData<T extends Employee>{
 
     protected ArrayList<T> EmployeeList = new ArrayList<>();
 
     public void add(T newEmployee){
+
         EmployeeList.add(newEmployee);
+
     }
 
     public T get(int index){
@@ -30,6 +32,17 @@ public class EmployeeData<T extends Employee> {
         EmployeeList.sort(
                 (employee1, employee2) -> employee2.getSumOfMissedHours() - employee1.getSumOfMissedHours()
         );
+    }
+
+
+    @SuppressWarnings("all")
+    public EmployeeData<T> clone() {
+        EmployeeData<T> clonedData = new EmployeeData<T>();
+        for (T employee : EmployeeList) {
+            T clonedEmployee = (T) employee.clone();
+            clonedData.add(clonedEmployee);
+        }
+        return clonedData;
     }
 
 

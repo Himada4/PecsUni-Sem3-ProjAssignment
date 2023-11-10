@@ -1,10 +1,9 @@
 import BusinessObjects.Employee;
 import BusinessObjects.EmployeeData;
-import Runtime.Populate;
-import Runtime.DailyWorkDataFunctions;
+import Runtime.QueryCatalog;
+import Runtime.QueryDailyWork;
 import Runtime.Calibration;
 import Runtime.Options;
-import Runtime.Utility;
 
 import java.util.Scanner;
 
@@ -30,13 +29,21 @@ public class Main {
         System.out.printf("_______________________________________________________________________________%n");
         Scanner scanner = new Scanner(System.in);
         scanner.useDelimiter("\n");
-        int numOfEmployees = 0;
-        int daysPassed = 0;
+        int numOfEmployees;
+        int daysPassed;
 
         //Skip Pre-Simulation Prompts if No overriding is needed.
-        if (Calibration.preCheck(scanner)){
+        if (new Calibration().preCheck(scanner)){
             //If The Existing Database Does not need to be touched, get information(employee data, and days passed) via file reading.
-            new Options(Utility.updateDatabase(new Populate().getEmployeeData(), Utility.numOfDaysData()), scanner).beginPrompt();
+            EmployeeData<Employee> employeeData = new QueryCatalog().getEmployeeDataFromCatalogFile();
+
+            QueryDailyWork query = new QueryDailyWork(employeeData);
+            query.getNumOfDaysFromFileCount();
+            query.getDailyWorkRawData();
+            EmployeeData<Employee> incorporatedEmployeeData = query.incorporateDailyWorkData();
+
+
+            new Options(incorporatedEmployeeData, employeeData, scanner).beginPrompt();
 
             return;
         }
@@ -67,13 +74,22 @@ public class Main {
         }
 
         //TASK 1
-        Populate populate = new Populate();
+        QueryCatalog queryCatalog = new QueryCatalog();
         //Generate - Calibrate the Catalog File for use, matching with the number of Employees.
-        populate.setEmployeeData(numOfEmployees);
+        queryCatalog.setEmployeeData(numOfEmployees);
         //Populate the Employee Collection with data extracted from the Catalog File.
-        EmployeeData<Employee> catalogEmployeeData = populate.getEmployeeData();
+        EmployeeData<Employee> employeeData = queryCatalog.getEmployeeDataFromCatalogFile();
 
-        new Options(Utility.updateDatabase(catalogEmployeeData, daysPassed), scanner)
+        //TASK 2
+        QueryDailyWork query = new QueryDailyWork(employeeData.clone());
+        //Generate - Calibrate the Daily Work Data Folder for use, each day having logs equal to the number of Employees.
+
+        query.setDailyWorkRawData(daysPassed);
+        query.getNumOfDaysFromFileCount();
+        query.getDailyWorkRawData();
+        EmployeeData<Employee> incorporatedEmployeeData = query.incorporateDailyWorkData();
+
+        new Options(incorporatedEmployeeData, employeeData, scanner)
         .beginPrompt();
 
 
